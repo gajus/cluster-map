@@ -6,14 +6,13 @@ It is a high level abstraction around a common pattern used to delegate a list o
 
 ## API
 
-`createClusterMap` function is used to create `createMap` map function. The created function operates using the instance of `cluster` used to create it. `createMap` function is used to execute tasks in parallel using Node.js cluster.
-
 ```js
 import {
     createClusterMap
 } from 'cluster-map';
 
 /**
+ * Executes tasks in parallel using Node.js cluster.
  * @typedef {Function} createClusterMap~createMap
  * @param {string[]} tasks An array of unique tasks sent to the workers.
  * @returns {Promise}
@@ -27,6 +26,7 @@ import {
  */
 
 /**
+ * Used to create a pre-configured instance of `clusterMap`.
  * @param {createClusterMap~cluster} cluster https://nodejs.org/api/cluster.html
  * @param {createClusterMap~configuration} configuration
  * @returns {createMap}
