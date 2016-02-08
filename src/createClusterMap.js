@@ -18,7 +18,8 @@ export default (cluster, userConfiguration = {}): Function => {
                 tasksInProgress,
                 results,
                 getNextTask,
-                registerResult,
+                logResult,
+                trackTask,
                 timeouts;
 
             results = [];
@@ -48,78 +49,70 @@ export default (cluster, userConfiguration = {}): Function => {
                 nextTask = getNextTask();
 
                 if (nextTask) {
-                    log('Tasking worker #' + worker.id + '. "' + chalk.blue(nextTask) + '".');
-
-                    tasksInProgress.push(nextTask);
+                    if (configuration.log) {
+                        trackTask(worker, nextTask);
+                    }
 
                     worker.send(nextTask);
-
-                    timeouts[nextTask.clusterMapId] = setTimeout(() => {
-                        log('nextTask timeout', nextTask);
-                    }, configuration.timeout);
                 } else if (results.length === numberOfTasks) {
                     cluster.disconnect(() => {
-                        resolve(_.map(results, (result) => {
-                            return result.result;
-                        }));
+                        resolve(results);
                     });
                 } else {
                     worker.disconnect();
                 }
             };
 
-            registerResult = (message: Object) => {
-                let taskInProgressIndex;
+            trackTask = (worker, task) => {
+                log('Tasking worker #' + worker.id + '. "' + chalk.blue(task) + '".');
 
-                if (!_.has(message, 'task')) {
-                    throw new Error('Child process message object must have "task" property.');
-                }
+                tasksInProgress[worker.id] = task;
 
-                if (!_.has(message, 'result')) {
-                    throw new Error('Child process message object must have "result" property.');
-                }
+                timeouts[worker.id] = setTimeout(() => {
+                    log('Task timeout.', task);
+                }, configuration.timeout);
+            };
 
-                taskInProgressIndex = _.indexOf(tasksInProgress, message.task);
+            logResult = (worker, result: Object) => {
+                let task;
 
-                if (taskInProgressIndex === -1) {
-                    log({
-                        task: message.task,
-                        taskInProgressIndex,
-                        tasksInProgress
-                    });
+                task = tasksInProgress[worker.id];
 
+                if (!task) {
                     throw new Error('Task does not exist in the processing queue.');
                 }
 
-                _.pullAt(tasksInProgress, taskInProgressIndex);
-
-                results.push(message);
-
-                clearTimeout(timeouts[message.clusterMapId]);
+                clearTimeout(timeouts[worker.id]);
 
                 log('\n' + prettyjson.render({
-                    'Received result from': message.task,
-                    'Tasks in progress (count)': tasksInProgress.length,
+                    'Received result from': task,
+                    'Tasks in progress (count)': _.size(tasksInProgress),
                     'Tasks in progress': tasksInProgress,
                     'Remaining tasks (count)': tasks.length - results.length
                 }));
+
+                delete tasksInProgress[worker.id];
+                delete timeouts[worker.id];
             };
 
             cluster.on('online', taskWorker);
 
             _.forEach(cluster.workers, (worker) => {
-                worker.on('message', (message) => {
+                worker.on('message', (result) => {
+                    results.push(result);
+
                     if (configuration.log) {
-                        registerResult(message);
+                        logResult(worker, result);
                     }
 
                     taskWorker(worker);
                 });
-                worker.on('error', (code, signal) => {
-                    log('error', {
-                        code,
-                        signal
+                worker.on('error', () => {
+                    log({
+                        task: tasksInProgress[worker.id]
                     });
+
+                    throw new Error('An error occurred.');
                 });
             });
         });

@@ -1,5 +1,9 @@
 # cluster-map
 
+[![Travis build status](http://img.shields.io/travis/gajus/cluster-map/master.svg?style=flat-square)](https://travis-ci.org/gajus/cluster-map)
+[![NPM version](http://img.shields.io/npm/v/cluster-map.svg?style=flat-square)](https://www.npmjs.com/package/cluster-map)
+[![Canonical Code Style](https://img.shields.io/badge/code%20style-canonical-blue.svg?style=flat-square)](https://github.com/gajus/canonical)
+
 Abstracts execution of tasks in parallel using [Node.js cluster](https://nodejs.org/api/cluster.html).
 
 It is a high level abstraction around a common pattern used to delegate a list of tasks to the workers.

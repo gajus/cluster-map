@@ -10,7 +10,7 @@ export default (userConfiguration = {}) => {
 
     defaultConfiguration = {
         numberOfProcesses: numberOfCpus,
-        log: true,
+        log: false,
         timeout: 5000
     };
 
