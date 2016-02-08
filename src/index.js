@@ -1,1 +1,2 @@
-export createClusterMap from './createClusterMap.js';
+export createClusterMap from './createClusterMap';
+export handleTask from './handleTask'

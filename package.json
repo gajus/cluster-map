@@ -10,14 +10,15 @@
     "lodash": "^4.2.1",
     "prettyjson": "^1.1.3"
   },
-  "description": "Abstracts execution of tasks in parallel using node cluster.",
+  "description": "Abstracts execution of tasks in parallel using Node.js cluster.",
   "devDependencies": {
     "pragmatist": "^3.0.3"
   },
   "keywords": [
     "node",
     "cluster",
-    "process"
+    "process",
+    "worker"
   ],
   "license": "BSD-3-Clause",
   "main": "./dist/index.js",

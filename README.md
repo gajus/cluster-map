@@ -1,8 +1,12 @@
 # cluster-map
 
-Abstracts execution of tasks in parallel using node cluster.
+Abstracts execution of tasks in parallel using [Node.js cluster](https://nodejs.org/api/cluster.html).
+
+It is a high level abstraction around a common pattern used to delegate a list of tasks to the workers.
 
 ## API
+
+`createClusterMap` function is used to create `createMap` map function. The created function operates using the instance of `cluster` used to create it. `createMap` function is used to execute tasks in parallel using Node.js cluster.
 
 ```js
 import {
@@ -30,14 +34,55 @@ import {
 createClusterMap(cluster);
 ```
 
+`handleTask` function is used to receive tasks and respond to the master.
+
+```js
+import {
+    handleTask
+} from 'cluster-map';
+
+
+/**
+ * Handles a task and returns a promise that is resolved with the result of the task.
+ * @typedef {Function} handleTask~handler
+ * @param {string} task
+ * @returns {Promise}
+ */
+
+/**
+ * @param {handleTask~handler} task
+ */
+handleTask(cluster);
+```
+
+## Communication With Worker
+
+```js
+import {
+    handleTask
+} from 'cluster-map';
+
+handleTask((task, callback) => {
+
+});
+```
+
 ## Example
 
-In this example, master declares an array of tasks that worker processes and returns number of the task (as derived from the task name).
+In this example,
+
+* Master declares an array of tasks (`['task 1', 'task 2', 'task 3']`).
+* `createClusterMap` is used to create an instance of `clusterMap`.
+* `clusterMap` is used to task the workers.
+* Workers handle the tasks and reply to the master.
+* `clusterMap` waits for all tasks to be processed.
+* When all tasks are processes, `clusterMap` resolves with an array of results.
 
 ```js
 import cluster from 'cluster';
 import {
-    createClusterMap
+    createClusterMap,
+    handleTask
 } from 'cluster-map';
 
 if (cluster.isMaster) {
@@ -55,16 +100,12 @@ if (cluster.isMaster) {
     clusterMap(tasks)
         .then((results) => {
             console.log(results);
-            // [1, 2, 3]
         });
 }
 
 if (cluster.isWorker) {
-    process.on('message', (task) => {
-        process.send({
-            task: task,
-            result: task.slice(-1)
-        });
+    handleTask((task) => {
+        return Promise.resolve(task.slice(-1));
     });
 }
 ```
@@ -103,11 +144,12 @@ clusterMap(tasks)
 `worker.js`
 
 ```js
-process.on('message', (task) => {
-    process.send({
-        task: task,
-        result: task.slice(-1)
-    });
+import {
+    handleTask
+} from 'cluster-map';
+
+handleTask((task) => {
+    return Promise.resolve(task.slice(-1));
 });
 ```
 
