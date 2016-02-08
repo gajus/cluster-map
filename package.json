@@ -37,5 +37,5 @@
     "watch-test": "npm run pragmatist watch-test",
     "watch-build": "npm run pragmatist watch-build"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
