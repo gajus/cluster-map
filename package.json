@@ -1,0 +1,40 @@
+{
+  "author": {
+    "email": "gajus@gajus.com",
+    "name": "Gajus Kuizinas",
+    "url": "http://gajus.com"
+  },
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "fecha": "^1.2.2",
+    "lodash": "^4.2.1",
+    "prettyjson": "^1.1.3"
+  },
+  "description": "Abstracts execution of tasks in parallel using node cluster.",
+  "devDependencies": {
+    "pragmatist": "^3.0.3"
+  },
+  "keywords": [
+    "node",
+    "cluster",
+    "process"
+  ],
+  "license": "BSD-3-Clause",
+  "main": "./dist/index.js",
+  "name": "cluster-map",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gajus/cluster-map"
+  },
+  "scripts": {
+    "pragmatist": "pragmatist",
+    "lint": "npm run pragmatist lint",
+    "test": "npm run pragmatist test",
+    "build": "npm run pragmatist build",
+    "watch": "npm run pragmatist watch",
+    "watch-lint": "npm run pragmatist watch-lint",
+    "watch-test": "npm run pragmatist watch-test",
+    "watch-build": "npm run pragmatist watch-build"
+  },
+  "version": "1.0.0"
+}
