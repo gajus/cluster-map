@@ -59,18 +59,6 @@ import {
 handleTask(cluster);
 ```
 
-## Communication With Worker
-
-```js
-import {
-    handleTask
-} from 'cluster-map';
-
-handleTask((task, callback) => {
-
-});
-```
-
 ## Example
 
 In this example,
